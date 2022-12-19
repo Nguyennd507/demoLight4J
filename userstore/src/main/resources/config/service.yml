@@ -1,0 +1,16 @@
+# Singleton service factory configuration/IoC injection
+singletons:
+
+- javax.sql.DataSource:
+  - com.zaxxer.hikari.HikariDataSource:
+      jdbcUrl: "jdbc:postgresql://localhost:5432/petstore"
+      username: postgres
+      password: ""
+      maximumPoolSize: 95
+  # MapConsumerRepository implements CustomerRepository with no other dependency
+- com.networknt.petstore.domain.UserRepository:
+  - com.networknt.petstore.domain.UserRepositoryJdbc
+- com.networknt.petstore.service.UserService:
+  - com.networknt.petstore.service.UserServiceImpl
+
+

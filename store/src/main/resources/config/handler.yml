@@ -72,6 +72,7 @@ handlers:
   - com.networknt.petstore.handler.OrderPostHandler
   - com.networknt.petstore.handler.OrderGetByIdHandler
   - com.networknt.petstore.handler.OrderDeleteByIdHandler
+  - com.networknt.petstore.handler.OrderGetListPetsHandler
 
 chains:
   default:
@@ -93,6 +94,11 @@ paths:
     exec:
       - default
       - com.networknt.petstore.handler.OrdersGetHandler
+  - path: 'v1/order'
+    method: GET
+    exec:
+      - default
+      - com.networknt.petstore.handler.OrderGetListPetsHandler
   - path: '/v1/order'
     method: 'POST'
     exec:

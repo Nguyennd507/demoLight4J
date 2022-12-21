@@ -260,9 +260,16 @@
             <artifactId>postgresql</artifactId>
             <version>${version.postgres}</version>
         </dependency>
-        
-        
-        
+
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+
         <!-- Test Dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -270,8 +277,14 @@
             <version>${version.junit}</version>
             <scope>test</scope>
         </dependency>
-        
-        
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
+        </dependency>
+
+
     </dependencies>
 
     <build>

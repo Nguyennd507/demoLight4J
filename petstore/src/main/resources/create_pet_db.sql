@@ -1,7 +1,9 @@
 DROP TABLE IF EXISTS pet;
 CREATE TABLE  pet (
-                        id integer NOT NULL,
+                        id bigint NOT NULL,
                         name varchar(50) NOT NULL,
-                        tag varchar(50) NOT NULL,
+                        status varchar(50) NOT NULL,
+                        amount bigint NOT NULL,
+                        price bigint NOT NULL,
                         PRIMARY KEY  (id)
 );

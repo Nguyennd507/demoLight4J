@@ -1,5 +1,6 @@
 package com.networknt.petstore.service;
 
+import com.networknt.petstore.domain.DTO.PetDTO;
 import com.networknt.petstore.domain.Pet;
 import com.networknt.petstore.domain.PetRepository;
 import com.networknt.service.SingletonServiceFactory;
@@ -45,6 +46,17 @@ public class PetServiceImpl implements PetService {
         logger.info("PetService update Pet ");
         petRepository.update(id, pet);
 
+    }
+
+    @Override
+    public void updatePetInventory(PetDTO pet) {
+        logger.info("PetService update Pet ");
+        Pet updatePet = petRepository.findOne(pet.getId());
+        if(updatePet != null) {
+            updatePet.setAmount(updatePet.getAmount()-pet.getAmount());
+            petRepository.update(pet.getId(), updatePet);
+            logger.debug("update amount pet inventory");
+        }
     }
 
 

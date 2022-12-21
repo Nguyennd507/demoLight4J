@@ -28,13 +28,14 @@ public class PetRepositoryJdbc implements PetRepository {
     @Override
     public Pet save(Pet pet) {
         pet.setId(IdentityGenerator.generate());
-        String psInsert = "INSERT INTO pet (id, name, status) VALUES (?, ?, ?)";
+        String psInsert = "INSERT INTO pet (id, name, status, amount, price) VALUES (?, ?, ?)";
 
         try (final Connection connection = dataSource.getConnection(); PreparedStatement stmt = connection.prepareStatement(psInsert)) {
             stmt.setLong(1, pet.getId());
             stmt.setString(2, pet.getName());
             stmt.setString(3, pet.getStatus());
-
+            stmt.setLong(4, pet.getAmount());
+            stmt.setLong(5, pet.getPrice());
             int count = stmt.executeUpdate();
             if (count != 1) {
                 logger.error("Failed to insert Pet: {}", pet.getId());
@@ -49,12 +50,16 @@ public class PetRepositoryJdbc implements PetRepository {
     @Override
     public Pet update(Long id, Pet pet) {
 
-        String psUpdate = "UPDATE pet SET name = ?, status = ? WHERE  id = ?";
+        String psUpdate = "UPDATE pet SET  name = ?, status = ?, amount = ?, price = ? WHERE  id = ?";
         if (exists(id)) {
             try (final Connection connection = dataSource.getConnection()) {
                 PreparedStatement stmt = connection.prepareStatement(psUpdate);
+               // stmt.setLong(1, pet.getId());
                 stmt.setString(1, pet.getName());
                 stmt.setString(2, pet.getStatus());
+                stmt.setLong(3, pet.getAmount());
+                stmt.setLong(4, pet.getPrice());
+                stmt.setLong(5, id);
                 int count = stmt.executeUpdate();
                 if (count != 1) {
                     logger.error("Failed to update pet: {}", pet.getId());
@@ -70,7 +75,7 @@ public class PetRepositoryJdbc implements PetRepository {
 
     @Override
     public Pet findOne(Long id) {
-        String psSelect = "SELECT id, name, status from pet WHERE id = ?";
+        String psSelect = "SELECT id, name, status, amount, price from pet WHERE id = ?";
         Pet pet = null;
         try (final Connection connection = dataSource.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement(psSelect);
@@ -84,6 +89,8 @@ public class PetRepositoryJdbc implements PetRepository {
                 pet.setId(id);
                 pet.setName(rs.getString("name"));
                 pet.setStatus(rs.getString("status"));
+                pet.setAmount(rs.getLong("amount"));
+                pet.setPrice(rs.getLong("price"));
             }
 
         } catch (SQLException e) {
@@ -106,7 +113,7 @@ public class PetRepositoryJdbc implements PetRepository {
     @Override
     public List<Pet> findAll() {
         List<Pet> pets = new ArrayList();
-        String psSelect = "SELECT id,  name, status from pet ";
+        String psSelect = "SELECT id,  name, status, amount, price from pet ";
         Pet pet = null;
         try (final Connection connection = dataSource.getConnection()){
             PreparedStatement stmt = connection.prepareStatement(psSelect);
@@ -116,6 +123,8 @@ public class PetRepositoryJdbc implements PetRepository {
                 pet.setId(rs.getLong("id"));
                 pet.setName(rs.getString("name"));
                 pet.setStatus(rs.getString("status"));
+                pet.setAmount(rs.getLong("amount"));
+                pet.setPrice(rs.getLong("price"));
                pets.add(pet);
             }
         } catch (SQLException e) {

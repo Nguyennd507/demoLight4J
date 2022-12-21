@@ -16,7 +16,7 @@ server.enableHttp: false
 server.httpsPort: 8444
 server.enableHttps: true
 server.enableHttp2: true
-server.enableRegistry: false
+server.enableRegistry: true
 server.serviceId: com.networknt.example.petstore-3.0.1
 server.buildNumber: 3.0.1
 
@@ -34,14 +34,12 @@ service.singletons:
       path: portal
       parameters:
         registryRetryPeriod: '30000'
-- com.networknt.portal.registry.client.PortalRegistryClient:
-  - com.networknt.portal.registry.client.PortalRegistryClientImpl
-- com.networknt.registry.Registry:
-  - com.networknt.portal.registry.PortalRegistry
-- com.networknt.balance.LoadBalance:
-  - com.networknt.balance.RoundRobinLoadBalance
-- com.networknt.cluster.Cluster:
-  - com.networknt.cluster.LightCluster
+#- com.networknt.registry.Registry:
+#  - com.networknt.registry.support.DirectRegistry
+#- com.networknt.balance.LoadBalance:
+#  - com.networknt.balance.RoundRobinLoadBalance
+#- com.networknt.cluster.Cluster:
+#  - com.networknt.cluster.LightCluster
 # StartupHookProvider implementations, there are one to many and they are called in the same sequence defined.
 - com.networknt.server.StartupHookProvider:
   

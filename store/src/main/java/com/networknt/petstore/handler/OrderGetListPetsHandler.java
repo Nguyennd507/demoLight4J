@@ -6,14 +6,12 @@ import com.networknt.body.BodyHandler;
 import com.networknt.client.Http2Client;
 import com.networknt.cluster.Cluster;
 import com.networknt.config.Config;
-
 import com.networknt.exception.ApiException;
 import com.networknt.exception.ClientException;
 import com.networknt.handler.LightHttpHandler;
 import com.networknt.http.HttpStatus;
 import com.networknt.http.MediaType;
 import com.networknt.http.ResponseEntity;
-import com.networknt.petstore.domain.DTO.PetDTO;
 import com.networknt.petstore.domain.Order;
 import com.networknt.petstore.service.OrderService;
 import com.networknt.server.Server;
@@ -38,34 +36,30 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
-For more information on how to write business handlers, please check the link below.
-https://doc.networknt.com/development/business-handler/rest/
-*/
-public class OrderPostHandler implements LightHttpHandler {
-    private static final Logger logger = LoggerFactory.getLogger(OrderPostHandler.class);
+public class OrderGetListPetsHandler implements LightHttpHandler {
+    private static final Logger logger = LoggerFactory.getLogger(OrderGetListPetsHandler.class);
     private static OrderService orderService = SingletonServiceFactory.getBean(OrderService.class);
     private static final ObjectMapper objectMapper = Config.getInstance().getMapper();
     private  static final String API_ERROR = "ERR30000";
     static Cluster cluster = SingletonServiceFactory.getBean(Cluster.class);
     static String apibHost;
-    static String path = "/v1/pets/inventory/update";
+    static String path = "/v1/pets/inventory";
     static String tag = Server.getServerConfig().getEnvironment();
 
     static Http2Client client = Http2Client.getInstance();
     static ClientConnection connectionB;
 
 
-    public OrderPostHandler() {
+    public OrderGetListPetsHandler() {
         try {
             apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
             connectionB = client.connect(new URI(apibHost),
-                    Http2Client.WORKER, Http2Client.SSL,
-                    Http2Client.BUFFER_POOL,
-                    OptionMap.create(UndertowOptions.ENABLE_HTTP2, true))
-                            .get();
+                            Http2Client.WORKER, Http2Client.SSL,
+                            Http2Client.BUFFER_POOL,
+                            OptionMap.create(UndertowOptions.ENABLE_HTTP2, true))
+                    .get();
         } catch (Exception e) {
-                logger.error(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 
@@ -88,8 +82,11 @@ public class OrderPostHandler implements LightHttpHandler {
 
     @Override
     public void handleRequest(HttpServerExchange exchange) throws Exception {
+        //HeaderMap requestHeaders = exchange.getRequestHeaders();
+        //HttpMethod httpMethod = HttpMethod.resolve(exchange.getRequestMethod().toString());
+        HeaderMap responseHeaders = new HeaderMap();
+        responseHeaders.add(Headers.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
 
-        List<Object> list = new ArrayList<>();
         if(connectionB == null || !connectionB.isOpen()) {
             try {
                 apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
@@ -98,7 +95,7 @@ public class OrderPostHandler implements LightHttpHandler {
                                 Http2Client.SSL,
                                 Http2Client.BUFFER_POOL,
                                 OptionMap.create(UndertowOptions.ENABLE_HTTP2, true))
-                                .get();
+                        .get();
             } catch (Exception e) {
                 logger.error("Exeption:", e);
                 throw new ClientException(e);
@@ -107,43 +104,32 @@ public class OrderPostHandler implements LightHttpHandler {
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicReference<ClientResponse> referenceB = new AtomicReference<>();
 
-        Map<String, Object> bodyMap = (Map<String, Object>)exchange.getAttachment(BodyHandler.REQUEST_BODY);
-        Order order = Config.getInstance().getMapper().convertValue(bodyMap, Order.class);
-        ResponseEntity<String> responseEntity = createOrder(order);
-        responseEntity.getHeaders().forEach(values -> {
-            exchange.getResponseHeaders().add(values.getHeaderName(), values.getFirst());
-        });
-        exchange.setStatusCode(responseEntity.getStatusCodeValue());
-        exchange.getResponseSender().send(responseEntity.getBody());
+        ResponseEntity<String> responseEntity ;
 
         try {
-            ClientRequest requestB =  new ClientRequest().setMethod(Methods.PUT)
-                     .setPath(path);
-
+            ClientRequest requestB = new ClientRequest().setMethod(Methods.GET).setPath(path);
             if(false) client.propagateHeaders(requestB, exchange);
-            requestB.getRequestHeaders().put(Headers.CONTENT_TYPE, "application/json");
-            requestB.getRequestHeaders().put(Headers.TRANSFER_ENCODING, "chunked");
-            PetDTO pet = convertToPet(order);
-            connectionB.sendRequest(requestB, client.createClientCallback(referenceB, latch, objectMapper.writeValueAsString(pet)));
+            connectionB.sendRequest(requestB, client.createClientCallback(referenceB, latch));
+
             latch.await();
 
             int statusCodeB = referenceB.get().getResponseCode();
             if(statusCodeB >= 300){
                 throw new Exception("Failed to call API PetService: " + statusCodeB);
             }
-            List<Object> apibList = Config.getInstance().getMapper().readValue(referenceB.get().getAttachment(Http2Client.RESPONSE_BODY),
+            List<Object> apiListPet = Config.getInstance().getMapper().readValue(referenceB.get().getAttachment(Http2Client.RESPONSE_BODY),
                     new TypeReference<List<Object>>(){});
-            list.addAll(apibList);
+
+            responseEntity = new ResponseEntity<>(objectMapper.writeValueAsString(apiListPet), responseHeaders, HttpStatus.OK);
+
         } catch (Exception e) {
             logger.error("Exception:", e);
             throw new ClientException(e);
         }
-    }
-
-    private PetDTO convertToPet(Order order) {
-        PetDTO pet = new PetDTO();
-        pet.setId(order.getPetId());
-        pet.setAmount(order.getQuantity());
-        return pet;
+        responseEntity.getHeaders().forEach(values -> {
+            exchange.getResponseHeaders().add(values.getHeaderName(), values.getFirst());
+        });
+        exchange.setStatusCode(responseEntity.getStatusCodeValue());
+        exchange.getResponseSender().send(responseEntity.getBody());
     }
 }

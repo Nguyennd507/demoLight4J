@@ -11,13 +11,13 @@ client.verifyHostname: true
 
 # server.yml
 # https://github.com/networknt/light-4j/blob/master/server/src/main/resources/config/server.yml
-server.httpPort: 8081
+server.httpPort: 8085
 server.enableHttp: false
 server.httpsPort: 8445
 server.enableHttps: true
 server.enableHttp2: true
 server.enableRegistry: true
-server.serviceId: com.networknt.example.store-3.0.1
+server.serviceId: store.301
 server.buildNumber: 3.0.1
 
 # openapi-security.yml

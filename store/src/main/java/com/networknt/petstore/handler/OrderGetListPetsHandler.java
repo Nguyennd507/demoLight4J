@@ -2,7 +2,6 @@ package com.networknt.petstore.handler;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.networknt.body.BodyHandler;
 import com.networknt.client.Http2Client;
 import com.networknt.cluster.Cluster;
 import com.networknt.config.Config;
@@ -30,9 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.xnio.OptionMap;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -52,7 +49,7 @@ public class OrderGetListPetsHandler implements LightHttpHandler {
 
     public OrderGetListPetsHandler() {
         try {
-            apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
+            apibHost = cluster.serviceToUrl("https", "pet.301", tag, null);
             connectionB = client.connect(new URI(apibHost),
                             Http2Client.WORKER, Http2Client.SSL,
                             Http2Client.BUFFER_POOL,
@@ -89,7 +86,7 @@ public class OrderGetListPetsHandler implements LightHttpHandler {
 
         if(connectionB == null || !connectionB.isOpen()) {
             try {
-                apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
+                apibHost = cluster.serviceToUrl("https", "pet.301", tag, null);
                 connectionB = client.connect(new URI(apibHost),
                                 Http2Client.WORKER,
                                 Http2Client.SSL,

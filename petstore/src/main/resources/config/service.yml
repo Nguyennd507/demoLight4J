@@ -5,16 +5,24 @@ singletons:
           username: postgres
           password: ''
           maximumPoolSize: 95
+
   - com.networknt.petstore.domain.PetRepository:
       - com.networknt.petstore.domain.PetRepositoryJdbc
   - com.networknt.petstore.service.PetService:
       - com.networknt.petstore.service.PetServiceImpl
+
   - com.networknt.registry.URL:
       - com.networknt.registry.URLImpl:
+          protocol: light
+          host: localhost
+          port: 8500
+          path: consul
           parameters:
-            com.networknt.pet-1.0.0: 'https://localhost:8445'
+            registryRetryPeriod: '30000'
+  - com.networknt.consul.client.ConsulClient:
+      - com.networknt.consul.client.ConsulClientImpl
   - com.networknt.registry.Registry:
-      - com.networknt.registry.support.DirectRegistry
+      - com.networknt.consul.ConsulRegistry
   - com.networknt.balance.LoadBalance:
       - com.networknt.balance.RoundRobinLoadBalance
   - com.networknt.cluster.Cluster:

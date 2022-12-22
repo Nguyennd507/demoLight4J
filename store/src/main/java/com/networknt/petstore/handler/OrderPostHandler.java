@@ -58,7 +58,7 @@ public class OrderPostHandler implements LightHttpHandler {
 
     public OrderPostHandler() {
         try {
-            apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
+            apibHost = cluster.serviceToUrl("https", "pet.301", tag, null);
             connectionB = client.connect(new URI(apibHost),
                     Http2Client.WORKER, Http2Client.SSL,
                     Http2Client.BUFFER_POOL,
@@ -92,7 +92,7 @@ public class OrderPostHandler implements LightHttpHandler {
         List<Object> list = new ArrayList<>();
         if(connectionB == null || !connectionB.isOpen()) {
             try {
-                apibHost = cluster.serviceToUrl("https", "com.networknt.ab-1.0.0", tag, null);
+                apibHost = cluster.serviceToUrl("https", "pet.301", tag, null);
                 connectionB = client.connect(new URI(apibHost),
                                 Http2Client.WORKER,
                                 Http2Client.SSL,

@@ -1,17 +1,31 @@
-# Singleton service factory configuration/IoC injection
 singletons:
+  - javax.sql.DataSource:
+      - com.zaxxer.hikari.HikariDataSource:
+          jdbcUrl: 'jdbc:postgresql://localhost:5432/petstore'
+          username: postgres
+          password: ''
+          maximumPoolSize: 95
 
-- javax.sql.DataSource:
-  - com.zaxxer.hikari.HikariDataSource:
-      jdbcUrl: "jdbc:postgresql://localhost:5432/petstore"
-      username: postgres
-      password: ""
-      maximumPoolSize: 95
-  # MapConsumerRepository implements CustomerRepository with no other dependency
-- com.networknt.petstore.domain.PetRepository:
-  - com.networknt.petstore.domain.PetRepositoryJdbc
-- com.networknt.petstore.service.PetService:
-  - com.networknt.petstore.service.PetServiceImpl
-  # HandlerProvider implementation
-- com.networknt.petstore.handler.HandlerProvider:
-  - com.networknt.petstore.handler.PathPetHandlerProvider
+  - com.networknt.petstore.domain.PetRepository:
+      - com.networknt.petstore.domain.PetRepositoryJdbc
+  - com.networknt.petstore.service.PetService:
+      - com.networknt.petstore.service.PetServiceImpl
+
+  - com.networknt.registry.URL:
+      - com.networknt.registry.URLImpl:
+          protocol: light
+          host: localhost
+          port: 8500
+          path: consul
+          parameters:
+            registryRetryPeriod: '30000'
+  - com.networknt.consul.client.ConsulClient:
+      - com.networknt.consul.client.ConsulClientImpl
+  - com.networknt.registry.Registry:
+      - com.networknt.consul.ConsulRegistry
+  - com.networknt.balance.LoadBalance:
+      - com.networknt.balance.RoundRobinLoadBalance
+  - com.networknt.cluster.Cluster:
+      - com.networknt.cluster.LightCluster
+  - com.networknt.petstore.handler.HandlerProvider:
+      - com.networknt.petstore.handler.PathPetHandlerProvider

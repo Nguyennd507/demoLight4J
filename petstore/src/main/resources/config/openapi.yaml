@@ -175,6 +175,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /pets/inventory/update:
+    put:
+      summary: "Update amount pet"
+      operationId: "updatePetInventory"
+      requestBody:
+        description: "Pet to update to the store"
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PetInventory"
+      tags:
+        - "pets"
+      security:
+        - petstore_auth:
+            - "read:pets"
+            - "write:pets"
+      responses:
+        "201":
+          description: "Null response"
+        default:
+          description: "unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /notifications:
     get:
       summary: "Get Notifications"
@@ -225,6 +251,18 @@ components:
           type: "string"
         tag:
           type: "string"
+    PetInventory:
+      type: "object"
+      required:
+      - "id"
+      - "amount"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        amount:
+          type: "integer"
+          format: "int64"
     Error:
       type: "object"
       required:

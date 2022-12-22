@@ -1,5 +1,6 @@
 package com.networknt.petstore.service;
 
+import com.networknt.petstore.domain.DTO.PetDTO;
 import com.networknt.petstore.domain.Pet;
 
 import java.util.List;
@@ -10,4 +11,5 @@ public interface PetService {
     Pet getPetById(Long id);
     void addPet(Pet pet);
     void updatePet(Long id, Pet pet);
+    void updatePetInventory(PetDTO pet);
 }

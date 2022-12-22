@@ -83,6 +83,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+    get:
+      summary: "GetList a Pets"
+      operationId: "getListPets"
+      tags:
+        - "pet"
+      security:
+        - petstore_auth:
+            - "read:order"
+            - "write:order"
+      responses:
+        "201":
+          description: "Null response"
+        default:
+          description: "unexpected error"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   /order/{orderId}:
     get:
       summary: "Info for a specific pet"
@@ -190,6 +208,19 @@ components:
         shipDate:
           type : "string"
           format: "date"
+    Pet:
+      type: "object"
+      required:
+        - "id"
+        - "name"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+        name:
+          type: "string"
+        tag:
+          type: "string"
     Error:
       type: "object"
       required:
